@@ -27,8 +27,18 @@ export default async function handler(req, res) {
     [uid]
   );
 
+  // % de comisión propio del usuario (el admin puede personalizarlo); 10 por defecto
+  let comisionPct = 10;
+  try {
+    const c = await dbGet("SELECT commission_rate FROM users WHERE id = ?", [uid]);
+    if (c && c.commission_rate !== null && c.commission_rate !== undefined) comisionPct = Number(c.commission_rate);
+  } catch {
+    // columna aún sin crear: se usa el valor por defecto
+  }
+
   res.status(200).json({
     referral_code: user.referral_code,
+    comision_pct: comisionPct,
     total_referidos: totalReferidos,
     total_ganado_cents: totalGanado,
     historial,

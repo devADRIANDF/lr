@@ -1,0 +1,15 @@
+# dependencias y compilación
+node_modules/
+.next/
+out/
+
+# variables de entorno (las reales se ponen en Vercel; aquí solo va .env.example)
+.env
+.env.local
+.env.*.local
+
+# Vercel y sistema
+.vercel/
+.DS_Store
+*.log
+npm-debug.log*

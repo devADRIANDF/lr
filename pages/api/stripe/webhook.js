@@ -1,4 +1,5 @@
 import stripe from "../../../lib/stripe";
+import { dbGet, dbRun } from "../../../lib/db";
 import {
   crearPedidoCuentaPagado, acreditarSaldoPagado,
   crearSuscripcionPagada, registrarRenovacionMensual, marcarEstadoSuscripcion,
@@ -17,6 +18,23 @@ function buffer(readable) {
   });
 }
 
+// Stripe reintenta un aviso si no recibe respuesta a tiempo. Para no contar dos veces el mismo pago,
+// se apunta el id de cada evento ya procesado. Si la tabla no existe todavía (no se ha ejecutado el
+// schema.sql actualizado), esto se salta sin romper nada.
+async function yaProcesado(eventId) {
+  try {
+    return !!(await dbGet("SELECT 1 AS ok FROM stripe_events WHERE id = ?", [eventId]));
+  } catch {
+    return false;
+  }
+}
+
+async function marcarProcesado(eventId) {
+  try {
+    await dbRun("INSERT INTO stripe_events (id) VALUES (?) ON CONFLICT DO NOTHING", [eventId]);
+  } catch {}
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
 
@@ -30,6 +48,8 @@ export default async function handler(req, res) {
     console.error("Firma de webhook inválida:", err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
+
+  if (await yaProcesado(event.id)) return res.status(200).json({ received: true, duplicate: true });
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
@@ -99,5 +119,6 @@ export default async function handler(req, res) {
     }
   }
 
+  await marcarProcesado(event.id);
   res.status(200).json({ received: true });
 }

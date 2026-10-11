@@ -10,8 +10,12 @@ CREATE TABLE IF NOT EXISTS users (
   wallet_balance INTEGER NOT NULL DEFAULT 0,
   referral_code TEXT UNIQUE NOT NULL,
   referred_by INTEGER,
+  commission_rate NUMERIC,            -- % de comisión de referido propio; vacío = 10% por defecto
   created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+-- Si la tabla users ya existía sin esta columna, la añade (no hace nada si ya está)
+ALTER TABLE users ADD COLUMN IF NOT EXISTS commission_rate NUMERIC;
 
 CREATE TABLE IF NOT EXISTS subscriptions (
   id SERIAL PRIMARY KEY,
@@ -56,5 +60,11 @@ CREATE TABLE IF NOT EXISTS referral_earnings (
   from_email TEXT,
   order_id INTEGER NOT NULL REFERENCES orders(id),
   amount_cents INTEGER NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Eventos de Stripe ya procesados (evita contar dos veces un pago si Stripe reintenta el aviso)
+CREATE TABLE IF NOT EXISTS stripe_events (
+  id TEXT PRIMARY KEY,
   created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

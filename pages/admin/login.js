@@ -10,35 +10,44 @@ export default function AdminLogin() {
   async function onSubmit(e) {
     e.preventDefault();
     setError(null);
-    const r = await fetch("/api/admin/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
-    });
-    const data = await r.json();
-    if (!r.ok) return setError(data.error);
-    router.push("/admin");
+    try {
+      const r = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      const data = await r.json();
+      if (!r.ok) return setError(data.error || "No se pudo entrar.");
+      router.push("/admin");
+    } catch {
+      setError("No se pudo conectar. Inténtalo de nuevo.");
+    }
   }
 
   return (
     <>
-      <Head><title>Acceso admin — Lamine Resell</title></Head>
-      <main className="flex min-h-screen items-center justify-center bg-page px-5">
-        <form onSubmit={onSubmit} className="w-full max-w-sm rounded-none border border-line bg-surface p-6">
-          <h1 className="font-display text-xl font-700 text-ink">Panel de administración</h1>
-          <label className="mt-6 block text-xs font-600 uppercase tracking-wide text-mist">Contraseña</label>
+      <Head>
+        <title>Acceso admin | Lamine Resell</title>
+        <meta name="robots" content="noindex" />
+      </Head>
+      <main className="flex min-h-screen items-center justify-center bg-ink px-5">
+        <form onSubmit={onSubmit} className="w-full max-w-sm bg-paper p-7">
+          <h1 className="cond text-[56px]">Administración</h1>
+          <label htmlFor="pw" className="field-label mt-7">Contraseña</label>
           <input
+            id="pw"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             autoFocus
-            className="mt-2 w-full rounded-none border border-line bg-page px-4 py-3 text-sm text-ink outline-none focus:border-ink"
+            autoComplete="current-password"
+            className="field"
           />
-          {error && <p className="mt-3 text-xs text-coral">{error}</p>}
-          <button type="submit" className="mt-5 w-full rounded-none bg-ink py-3 text-sm font-600 text-white hover:bg-ink/90">
-            Entrar
-          </button>
+          {error && (
+            <p role="alert" className="mt-4 border-l-[6px] border-alert pl-3 text-[15px] font-medium text-alert">{error}</p>
+          )}
+          <button type="submit" className="btn btn-ink mt-6 w-full">Entrar</button>
         </form>
       </main>
     </>

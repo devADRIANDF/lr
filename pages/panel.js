@@ -1,13 +1,23 @@
-import Head from "next/head";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Nav from "../components/Nav";
+import Meta from "../components/Meta";
+import { eur, eurExacto } from "../lib/catalogo";
+
+function Estado({ s }) {
+  const base = "inline-block border-2 px-2 py-0.5 text-[13px] font-semibold capitalize leading-5";
+  if (s === "entregado") return <span className={`${base} border-ink bg-ink text-paper`}>{s}</span>;
+  if (s === "cancelado") return <span className={`${base} border-ash text-ash line-through`}>{s}</span>;
+  return <span className={`${base} border-ink text-ink`}>{s}</span>;
+}
 
 export default function Panel() {
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState(null);
   const [pedidos, setPedidos] = useState([]);
   const [loaded, setLoaded] = useState(false);
+  const [copiado, setCopiado] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -31,24 +41,24 @@ export default function Panel() {
   if (!loaded) {
     return (
       <>
+        <Meta title="Mi cuenta | Lamine Resell" path="/panel" />
         <Nav />
-        <main className="min-h-screen bg-page px-5 py-16 text-sm text-mist">Cargando tu perfil…</main>
+        <main className="wrap py-16 text-[17px] text-ash">Cargando tu cuenta…</main>
       </>
     );
   }
 
-  // Variables seguras con fallbacks
+  // Variables seguras con valores por defecto
   const referralCode = stats?.referral_code || stats?.referralCode || stats?.code || "";
   const referralLink =
-    typeof window !== "undefined" && referralCode
-      ? `${window.location.origin}/registro?ref=${referralCode}`
-      : "";
+    typeof window !== "undefined" && referralCode ? `${window.location.origin}/registro?ref=${referralCode}` : "";
 
   const totalReferidos = stats?.total_referidos ?? stats?.totalReferrals ?? stats?.referralsCount ?? 0;
   const totalGanadoCents = stats?.total_ganado_cents ?? (stats?.totalEarnings ? stats.totalEarnings * 100 : 0);
   const walletBalance = user?.wallet_balance ?? user?.balance ?? 0;
+  const comisionPct = stats?.comision_pct ?? 10;
 
-  // Garantizar que historial sea siempre un Array (evita el crash por .length)
+  // El historial siempre es una lista (evita fallos al hacer .length)
   const historial = Array.isArray(stats?.historial)
     ? stats.historial
     : Array.isArray(stats?.earnings)
@@ -58,135 +68,184 @@ export default function Panel() {
     : [];
 
   const userEmail = user?.email || "Usuario";
-  const userInitial = userEmail[0]?.toUpperCase() || "U";
+
+  async function copiar() {
+    if (!referralLink) return;
+    try {
+      await navigator.clipboard.writeText(referralLink);
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
+    } catch {}
+  }
 
   return (
     <>
-      <Head>
-        <title>Tu perfil — Lamine Resell</title>
-      </Head>
+      <Meta title="Mi cuenta | Lamine Resell" path="/panel" />
       <Nav />
-      <main className="min-h-screen bg-page pb-28 md:pb-10">
-        <div className="mx-auto max-w-4xl px-5 py-8">
-          <div className="flex items-center gap-4">
-            <span className="flex h-14 w-14 items-center justify-center rounded-none bg-neutral-100 font-display text-xl font-700 text-ink">
-              {userInitial}
-            </span>
-            <div>
-              <p className="font-display text-lg font-700 text-ink">{userEmail}</p>
-              <p className="text-xs text-mist">Miembro de Lamine Resell</p>
+      <main>
+        <div className="wrap py-12 md:py-16">
+          <div className="flex flex-wrap items-end justify-between gap-5">
+            <div className="min-w-0">
+              <h1 className="cond text-[length:clamp(4rem,9vw,8rem)]">Tu cuenta</h1>
+              <p className="mt-4 break-all text-[17px] text-ink/75">{userEmail}</p>
+            </div>
+            <button
+              onClick={async () => {
+                await fetch("/api/auth/logout", { method: "POST" });
+                router.push("/");
+              }}
+              className="btn btn-line !h-11 !px-5 !text-lg"
+            >
+              Cerrar sesión
+            </button>
+          </div>
+
+          {/* Saldo y cifras */}
+          <div className="mt-10 grid border-[3px] border-ink md:grid-cols-12">
+            <div className="bg-ink p-6 text-paper md:col-span-6 md:p-8">
+              <p className="text-[15px] text-paper/70">Saldo del monedero</p>
+              <p className="cond mt-3 text-[88px] leading-[0.8] md:text-[120px]">{eurExacto(walletBalance)}</p>
+              <Link href="/saldo" className="btn btn-paper mt-8">Recargar saldo</Link>
+            </div>
+            <div className="border-t-[3px] border-ink p-6 md:col-span-3 md:border-l-[3px] md:border-t-0 md:p-8">
+              <p className="text-[15px] text-ink/75">Personas invitadas</p>
+              <p className="cond mt-3 text-[88px] leading-[0.8] md:text-[120px]">{totalReferidos}</p>
+            </div>
+            <div className="border-t-[3px] border-ink p-6 md:col-span-3 md:border-l-[3px] md:border-t-0 md:p-8">
+              <p className="text-[15px] text-ink/75">Ganado en comisiones</p>
+              <p className="cond mt-3 text-[56px] leading-[0.85] md:text-[72px]">{eurExacto(totalGanadoCents)}</p>
             </div>
           </div>
 
-          <div className="mt-8 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-none border border-line bg-surface p-5">
-              <p className="text-xs font-500 text-mist">Saldo del monedero</p>
-              <p className="mt-2 font-display text-2xl font-700 text-ink">
-                {(walletBalance / 100).toFixed(2)} €
-              </p>
-            </div>
-            <div className="rounded-none border border-line bg-surface p-5">
-              <p className="text-xs font-500 text-mist">Personas invitadas</p>
-              <p className="mt-2 font-display text-2xl font-700 text-ink">{totalReferidos}</p>
-            </div>
-            <div className="rounded-none border border-line bg-surface p-5">
-              <p className="text-xs font-500 text-mist">Ganado en comisiones</p>
-              <p className="mt-2 font-display text-2xl font-700 text-ink">
-                {(totalGanadoCents / 100).toFixed(2)} €
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-6 rounded-none border border-line bg-surface p-5">
-            <p className="text-xs font-600 uppercase tracking-wide text-mist">Tu enlace para invitar</p>
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <code className="flex-1 truncate rounded-none border border-line bg-page px-3 py-2 text-xs text-ink">
-                {referralLink || "No disponible"}
-              </code>
-              <button
-                onClick={() => referralLink && navigator.clipboard.writeText(referralLink)}
-                className="rounded-none border border-line px-4 py-2 text-xs font-600 text-ink hover:border-ink hover:text-ink"
-              >
-                Copiar enlace
+          {/* Enlace de invitación */}
+          <section className="mt-14 md:mt-20">
+            <h2 className="cond text-[44px] md:text-[56px]">Tu enlace para invitar</h2>
+            <p className="mt-3 max-w-xl text-[17px] text-ink/75">
+              Ganas el {comisionPct}% de cada compra que se haga a través de tu enlace. La comisión se acredita en tu monedero.
+            </p>
+            <div className="mt-6 flex flex-col gap-3 md:flex-row">
+              <input
+                readOnly
+                value={referralLink || "No disponible"}
+                aria-label="Tu enlace de invitación"
+                onFocus={(e) => e.target.select()}
+                className="field flex-1 text-[15px]"
+              />
+              <button onClick={copiar} className="btn btn-ink md:min-w-[200px]" disabled={!referralLink}>
+                {copiado ? "Copiado" : "Copiar enlace"}
               </button>
             </div>
-            <p className="mt-2 text-xs text-mist">
-              Código {referralCode} · ganas el 10% de cada compra de quien invites
-            </p>
-          </div>
+            {referralCode && <p className="mt-3 text-[14px] text-ink/70">Tu código: <span className="font-semibold text-ink">{referralCode}</span></p>}
+          </section>
 
-          <div className="mt-8">
-            <p className="text-xs font-600 uppercase tracking-wide text-mist">Tus pedidos</p>
-            <div className="mt-3 overflow-hidden rounded-none border border-line bg-surface">
+          {/* Pedidos */}
+          <section className="mt-14 md:mt-20">
+            <h2 className="cond text-[44px] md:text-[56px]">Tus pedidos</h2>
+            <div className="mt-6 border-t-[3px] border-ink">
               {pedidos.length === 0 ? (
-                <p className="px-5 py-8 text-sm text-mist">Aún no has hecho ningún pedido.</p>
+                <div className="border-b-[3px] border-ink py-8">
+                  <p className="text-[17px] text-ink/75">Aún no has hecho ningún pedido.</p>
+                  <Link href="/producto" className="mt-4 inline-block text-[17px] font-semibold underline underline-offset-4">Ver el catálogo</Link>
+                </div>
               ) : (
                 pedidos.map((p) => (
-                  <div
-                    key={p.id}
-                    className="flex items-center justify-between border-b border-line px-5 py-3 last:border-0"
-                  >
+                  <div key={p.id} className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b-[3px] border-ink py-5">
                     <div>
-                      <p className="text-sm text-ink">
-                        {p.type === "cuenta" ? "Cuenta lista" : "Reviews a tu ID"} · {p.package} reviews
-                        {p.target_id ? ` · ID ${p.target_id}` : ""}
+                      <p className="cond-mid text-[28px]">
+                        {p.type === "cuenta" ? `Cuenta de ${p.package} valoraciones` : `${p.package} valoraciones`}
                       </p>
-                      <p className="text-xs text-mist">{new Date(p.created_at).toLocaleString("es-ES")}</p>
+                      <p className="mt-1 text-[14px] text-ink/70">{new Date(p.created_at).toLocaleString("es-ES")}</p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-600 text-ink">{(p.amount_cents / 100).toFixed(2)} €</p>
-                      <span
-                        className={`rounded-none px-2 py-0.5 text-[11px] font-600 capitalize ${
-                          p.status === "entregado"
-                            ? "bg-neutral-100 text-ink"
-                            : p.status === "cancelado"
-                            ? "bg-red-100 text-red-600"
-                            : "bg-amber-100 text-amber-700"
-                        }`}
-                      >
-                        {p.status}
-                      </span>
+                    <div className="flex items-center gap-4">
+                      <p className="cond text-[34px]">{eur(p.amount_cents)}</p>
+                      <Estado s={p.status} />
                     </div>
                   </div>
                 ))
               )}
             </div>
-          </div>
+          </section>
 
-          <div className="mt-8">
-            <p className="text-xs font-600 uppercase tracking-wide text-mist">Historial de comisiones</p>
-            <div className="mt-3 overflow-hidden rounded-none border border-line bg-surface">
+          {/* Comisiones */}
+          <section className="mt-14 md:mt-20">
+            <h2 className="cond text-[44px] md:text-[56px]">Historial de comisiones</h2>
+            <div className="mt-6 border-t-[3px] border-ink">
               {historial.length === 0 ? (
-                <p className="px-5 py-8 text-sm text-mist">
+                <p className="border-b-[3px] border-ink py-8 text-[17px] text-ink/75">
                   Aún no tienes comisiones. Comparte tu enlace para empezar a ganar.
                 </p>
               ) : (
                 historial.map((h, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center justify-between border-b border-line px-5 py-3 last:border-0"
-                  >
-                    <span className="text-sm text-ink">{h.from_email || h.email || "Usuario invitado"}</span>
-                    <span className="text-sm font-600 text-ink">
-                      +{((h.amount_cents || h.amount || 0) / 100).toFixed(2)} €
-                    </span>
+                  <div key={i} className="flex items-center justify-between gap-4 border-b-[3px] border-ink py-4">
+                    <span className="min-w-0 break-all text-[17px]">{h.from_email || h.email || "Usuario invitado"}</span>
+                    <span className="cond shrink-0 text-[30px]">+{eurExacto(h.amount_cents || h.amount || 0)}</span>
                   </div>
                 ))
               )}
             </div>
-          </div>
+          </section>
 
-          <button
-            onClick={async () => {
-              await fetch("/api/auth/logout", { method: "POST" });
-              router.push("/");
-            }}
-            className="mt-8 text-xs font-500 text-mist hover:text-ink"
-          >
-            Cerrar sesión
-          </button>
+          <CambiarPassword />
         </div>
       </main>
     </>
+  );
+}
+
+function CambiarPassword() {
+  const [actual, setActual] = useState("");
+  const [nueva, setNueva] = useState("");
+  const [msg, setMsg] = useState(null); // { ok, texto }
+  const [enviando, setEnviando] = useState(false);
+
+  async function onSubmit(e) {
+    e.preventDefault();
+    if (enviando) return;
+    setMsg(null);
+    setEnviando(true);
+    try {
+      const r = await fetch("/api/auth/cambiar-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ current_password: actual, new_password: nueva }),
+      });
+      const data = await r.json().catch(() => ({}));
+      if (r.ok) {
+        setMsg({ ok: true, texto: "Contraseña actualizada." });
+        setActual("");
+        setNueva("");
+      } else {
+        setMsg({ ok: false, texto: data.error || "No se pudo cambiar la contraseña." });
+      }
+    } catch {
+      setMsg({ ok: false, texto: "No se pudo conectar. Inténtalo de nuevo." });
+    }
+    setEnviando(false);
+  }
+
+  return (
+    <section className="mt-14 md:mt-20">
+      <h2 className="cond text-[44px] md:text-[56px]">Cambiar contraseña</h2>
+      <form onSubmit={onSubmit} className="mt-6 grid max-w-3xl gap-4 md:grid-cols-2">
+        <div>
+          <label htmlFor="actual" className="field-label">Contraseña actual</label>
+          <input id="actual" type="password" autoComplete="current-password" value={actual} onChange={(e) => setActual(e.target.value)} required className="field" />
+        </div>
+        <div>
+          <label htmlFor="nueva" className="field-label">Nueva contraseña (mínimo 6 caracteres)</label>
+          <input id="nueva" type="password" autoComplete="new-password" minLength={6} value={nueva} onChange={(e) => setNueva(e.target.value)} required className="field" />
+        </div>
+        <div className="md:col-span-2">
+          <button type="submit" disabled={enviando} className="btn btn-ink w-full md:w-auto">
+            {enviando ? "Guardando…" : "Guardar contraseña"}
+          </button>
+          {msg && (
+            <p role={msg.ok ? "status" : "alert"} className={`mt-4 text-[15px] font-medium ${msg.ok ? "border-l-[6px] border-ink pl-3" : "border-l-[6px] border-alert pl-3 text-alert"}`}>
+              {msg.texto}
+            </p>
+          )}
+        </div>
+      </form>
+    </section>
   );
 }

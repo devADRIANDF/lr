@@ -1,34 +1,55 @@
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { TELEGRAM_URL } from "../lib/catalogo";
+
+const DOCS = [
+  { href: "/legal/aviso-legal", label: "Aviso legal" },
+  { href: "/legal/privacidad", label: "Privacidad" },
+  { href: "/legal/condiciones", label: "Condiciones de venta" },
+];
+
 export default function LegalLayout({ title, children }) {
+  const { pathname } = useRouter();
   return (
-    <main className="min-h-screen bg-page pb-28 md:pb-10">
-      <div className="mx-auto max-w-2xl px-5 py-10">
-        <h1 className="font-display text-2xl font-700 text-ink">{title}</h1>
-        <div className="prose-legal mt-6 space-y-4 text-sm leading-relaxed text-ink">
-          {children}
+    <main>
+      <div className="wrap py-14 md:py-20">
+        <h1 className="cond max-w-[14ch] text-[64px] md:text-[112px]">{title}</h1>
+        <div className="mt-10 grid gap-14 md:mt-14 md:grid-cols-12">
+          <div className="prose-legal text-[17px] md:col-span-7">{children}</div>
+
+          <aside className="md:col-span-4 md:col-start-9">
+            <div className="md:sticky md:top-8">
+              <p className="field-label">Documentos legales</p>
+              <ul className="border-t-[3px] border-ink">
+                {DOCS.map((d) => {
+                  const activo = pathname === d.href;
+                  return (
+                    <li key={d.href} className="border-b border-rule">
+                      <Link
+                        href={d.href}
+                        aria-current={activo ? "page" : undefined}
+                        className={`block px-3 py-3 text-[17px] ${
+                          activo ? "bg-ink font-semibold text-paper" : "text-ink/80 hover:bg-bone hover:text-ink"
+                        }`}
+                      >
+                        {d.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              <div className="mt-8 bg-ink p-6 text-paper">
+                <p className="cond-mid text-[30px]">¿Alguna duda?</p>
+                <p className="mt-2 text-[15px] text-paper/75">Escríbenos por Telegram y te respondemos.</p>
+                <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className="btn btn-paper mt-5 w-full">
+                  Abrir Telegram
+                </a>
+              </div>
+            </div>
+          </aside>
         </div>
       </div>
-      <style jsx global>{`
-        .prose-legal h2 {
-          font-family: var(--font-display, inherit);
-          font-weight: 700;
-          font-size: 1rem;
-          color: #1b1f1e;
-          margin-top: 1.75rem;
-        }
-        .prose-legal p, .prose-legal li {
-          color: #767c7a;
-        }
-        .prose-legal ul {
-          list-style: disc;
-          padding-left: 1.25rem;
-          display: flex;
-          flex-direction: column;
-          gap: 0.25rem;
-        }
-        .prose-legal strong {
-          color: #1b1f1e;
-        }
-      `}</style>
     </main>
   );
 }

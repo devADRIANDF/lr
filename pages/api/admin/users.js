@@ -1,4 +1,5 @@
 import { dbAll, dbRun } from "../../../lib/db";
+import bcrypt from "bcryptjs";
 import { isAdminReq } from "../../../lib/adminAuth";
 
 export default async function handler(req, res) {
@@ -24,8 +25,22 @@ export default async function handler(req, res) {
   }
 
   if (req.method === "PATCH") {
-    const { id, commission_rate } = req.body || {};
+    const { id, commission_rate, new_password } = req.body || {};
     if (!id) return res.status(400).json({ error: "Falta el id del usuario." });
+
+    // Restablecer contraseña desde el admin
+    if (new_password !== undefined) {
+      if (typeof new_password !== "string" || new_password.length < 6) {
+        return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres." });
+      }
+      try {
+        await dbRun("UPDATE users SET password_hash = ? WHERE id = ?", [bcrypt.hashSync(new_password, 10), id]);
+        return res.status(200).json({ ok: true });
+      } catch (error) {
+        console.error("Error restableciendo contraseña:", error);
+        return res.status(500).json({ error: "Error guardando la contraseña." });
+      }
+    }
 
     // null/"" = vuelve a usar el 10% por defecto
     let rate = null;

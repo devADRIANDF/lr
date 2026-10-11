@@ -1,11 +1,12 @@
-import Head from "next/head";
+import Meta from "../../components/Meta";
+import { dominioDelSitio } from "../../lib/sitio";
 import Nav from "../../components/Nav";
 import LegalLayout from "../../components/LegalLayout";
 
 export default function AvisoLegal() {
   return (
     <>
-      <Head><title>Aviso legal — Lamine Resell</title></Head>
+      <Meta title="Aviso legal | Lamine Resell" path="/legal/aviso-legal" />
       <Nav />
       <LegalLayout title="Aviso legal">
       
@@ -21,14 +22,13 @@ export default function AvisoLegal() {
           <li>CIF: <strong>[CIF O NIF]</strong></li>
           <li>Domicilio: <strong>[DIRECCIÓN FISCAL]</strong></li>
           <li>Contacto (Telegram): <strong>t.me/LAMINE_RESELL</strong></li>
-          <li>Sitio web: <strong>laminerresell.com</strong></li>
+          <li>Sitio web: <strong>{dominioDelSitio()}</strong></li>
         </ul>
 
         <h2>2. Objeto</h2>
         <p>
-          Lamine Resell es una plataforma de venta de cuentas con reviews y de
-          adición de reviews a cuentas propias, operada por el titular
-          indicado en el punto anterior.
+          Lamine Resell es una plataforma de venta de cuentas con valoraciones,
+          operada por el titular indicado en el punto anterior.
         </p>
 
         <h2>3. Condiciones de acceso y uso</h2>

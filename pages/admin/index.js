@@ -4,9 +4,9 @@ import { useRouter } from "next/router";
 
 const ESTADOS = ["pendiente", "entregado", "cancelado"];
 const ESTADO_COLOR = {
-  pendiente: "bg-amber-100 text-amber-700",
-  entregado: "bg-neutral-100 text-ink",
-  cancelado: "bg-red-100 text-red-600",
+  pendiente: "border-2 border-ink bg-paper text-ink",
+  entregado: "border-2 border-ink bg-ink text-paper",
+  cancelado: "border-2 border-ash bg-paper text-ash line-through",
 };
 
 export default function Admin() {
@@ -81,12 +81,12 @@ export default function Admin() {
     <>
       <Head><title>Admin — Lamine Resell</title></Head>
       <main className="min-h-screen bg-page pb-16">
-        <header className="border-b border-line bg-surface">
+        <header className="border-b-[3px] border-ink bg-paper">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-            <h1 className="font-display text-lg font-700 text-ink">Lamine Resell · Admin</h1>
+            <h1 className="cond text-3xl text-ink">Lamine Resell Admin</h1>
             <button
               onClick={async () => { await fetch("/api/admin/logout", { method: "POST" }); router.push("/admin/login"); }}
-              className="text-xs font-500 text-mist hover:text-ink"
+              className="text-sm font-semibold text-ink underline underline-offset-4"
             >
               Cerrar sesión
             </button>
@@ -103,13 +103,13 @@ export default function Admin() {
             <Stat label="Comisiones pagadas" value={stats ? `${((stats.comisiones_cents || 0) / 100).toFixed(2)} €` : "—"} />
           </div>
 
-          <div className="mt-8 flex gap-2 border-b border-line">
+          <div className="mt-8 flex gap-2 border-b-[3px] border-ink">
             {["pedidos", "suscripciones", "usuarios"].map((t) => (
               <button
                 key={t}
                 onClick={() => setTab(t)}
-                className={`-mb-px border-b-2 px-4 py-2 text-sm font-600 capitalize ${
-                  tab === t ? "border-ink text-ink" : "border-transparent text-mist hover:text-ink"
+                className={`-mb-[3px] border-b-[3px] px-4 py-2 text-sm font-semibold capitalize ${
+                  tab === t ? "border-ink bg-ink text-paper" : "border-transparent text-ash hover:text-ink"
                 }`}
               >
                 {t}
@@ -124,8 +124,8 @@ export default function Admin() {
                   <button
                     key={f}
                     onClick={() => setFiltro(f)}
-                    className={`rounded-none border px-3 py-1.5 text-xs font-500 capitalize transition ${
-                      filtro === f ? "border-ink bg-neutral-100 text-ink" : "border-line text-mist hover:border-ink/60"
+                    className={`rounded-none border-2 px-3 py-1.5 text-xs font-semibold capitalize transition ${
+                      filtro === f ? "border-ink bg-ink text-paper" : "border-ink text-ink hover:bg-bone"
                     }`}
                   >
                     {f}
@@ -133,10 +133,10 @@ export default function Admin() {
                 ))}
               </div>
 
-              <div className="overflow-x-auto rounded-none border border-line bg-surface">
+              <div className="overflow-x-auto border-[3px] border-ink bg-paper">
                 <table className="w-full text-left text-sm">
                   <thead>
-                    <tr className="border-b border-line text-xs uppercase tracking-wide text-mist">
+                    <tr className="border-b-[3px] border-ink bg-bone text-xs font-semibold text-ink">
                       <th className="px-4 py-3">#</th>
                       <th className="px-4 py-3">Tipo</th>
                       <th className="px-4 py-3">Reviews</th>
@@ -163,7 +163,7 @@ export default function Admin() {
                           <select
                             value={o.status}
                             onChange={(e) => cambiarEstado(o.id, e.target.value)}
-                            className={`rounded-none border-0 px-2 py-1 text-xs font-600 capitalize outline-none ${ESTADO_COLOR[o.status] || ""}`}
+                            className={`rounded-none px-2 py-1 text-xs font-600 capitalize outline-none ${ESTADO_COLOR[o.status] || ""}`}
                           >
                             {ESTADOS.map((s) => (
                               <option key={s} value={s}>{s}</option>
@@ -182,10 +182,10 @@ export default function Admin() {
           )}
 
           {tab === "suscripciones" && (
-            <div className="mt-6 overflow-x-auto rounded-none border border-line bg-surface">
+            <div className="mt-6 overflow-x-auto border-[3px] border-ink bg-paper">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-line text-xs uppercase tracking-wide text-mist">
+                  <tr className="border-b-[3px] border-ink bg-bone text-xs font-semibold text-ink">
                     <th className="px-4 py-3">Cliente</th>
                     <th className="px-4 py-3">Tipo</th>
                     <th className="px-4 py-3">ID destino</th>
@@ -209,7 +209,7 @@ export default function Admin() {
                       <td className="px-4 py-3 text-xs text-mist">{s.created_at ? new Date(s.created_at).toLocaleDateString("es-ES") : "—"}</td>
                       <td className="px-4 py-3">
                         <span className={`rounded-none px-2 py-1 text-xs font-600 capitalize ${
-                          s.status === "activa" ? "bg-neutral-100 text-ink" : s.status === "impago" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-600"
+                          s.status === "activa" ? "border-2 border-ink bg-ink text-paper" : s.status === "impago" ? "border-2 border-ink text-ink" : "border-2 border-ash text-ash line-through"
                         }`}>
                           {s.status}
                         </span>
@@ -218,7 +218,7 @@ export default function Admin() {
                         {s.status === "activa" && (
                           <button
                             onClick={() => cancelarSuscripcion(s.stripe_subscription_id)}
-                            className="text-xs font-500 text-coral hover:underline"
+                            className="text-xs font-semibold text-alert hover:underline"
                           >
                             Cancelar
                           </button>
@@ -235,16 +235,17 @@ export default function Admin() {
           )}
 
           {tab === "usuarios" && (
-            <div className="mt-6 overflow-x-auto rounded-none border border-line bg-surface">
+            <div className="mt-6 overflow-x-auto border-[3px] border-ink bg-paper">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-line text-xs uppercase tracking-wide text-mist">
+                  <tr className="border-b-[3px] border-ink bg-bone text-xs font-semibold text-ink">
                     <th className="px-4 py-3">Email</th>
                     <th className="px-4 py-3">Código</th>
                     <th className="px-4 py-3">Saldo</th>
                     <th className="px-4 py-3">Referidos</th>
                     <th className="px-4 py-3">Comisiones ganadas</th>
                     <th className="px-4 py-3">% Comisión</th>
+                    <th className="px-4 py-3">Contraseña</th>
                     <th className="px-4 py-3">Alta</th>
                   </tr>
                 </thead>
@@ -259,11 +260,14 @@ export default function Admin() {
                       <td className="px-4 py-3">
                         <ComisionInput usuario={u} onGuardado={cargarTodo} />
                       </td>
+                      <td className="px-4 py-3">
+                        <ResetPassword usuario={u} />
+                      </td>
                       <td className="px-4 py-3 text-xs text-mist">{u.created_at ? new Date(u.created_at).toLocaleDateString("es-ES") : "—"}</td>
                     </tr>
                   ))}
                   {users.length === 0 && (
-                    <tr><td colSpan={7} className="px-4 py-8 text-center text-mist">Aún no hay usuarios registrados.</td></tr>
+                    <tr><td colSpan={8} className="px-4 py-8 text-center text-mist">Aún no hay usuarios registrados.</td></tr>
                   )}
                 </tbody>
               </table>
@@ -277,9 +281,54 @@ export default function Admin() {
 
 function Stat({ label, value, highlight }) {
   return (
-    <div className={`rounded-none border p-4 ${highlight ? "border-amber-300 bg-amber-50" : "border-line bg-surface"}`}>
-      <p className="text-xs font-500 text-mist">{label}</p>
-      <p className="mt-1 font-display text-xl font-700 text-ink">{value}</p>
+    <div className={`border-[3px] border-ink p-4 ${highlight ? "bg-ink text-paper" : "bg-paper text-ink"}`}>
+      <p className={`text-xs font-semibold ${highlight ? "text-paper/70" : "text-ash"}`}>{label}</p>
+      <p className="cond mt-2 text-4xl">{value}</p>
+    </div>
+  );
+}
+
+function ResetPassword({ usuario }) {
+  const [abierto, setAbierto] = useState(false);
+  const [pw, setPw] = useState("");
+  const [estado, setEstado] = useState(null);
+
+  async function guardar() {
+    if (pw.length < 6) return setEstado("corta");
+    setEstado("guardando");
+    const r = await fetch("/api/admin/users", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: usuario.id, new_password: pw }),
+    });
+    if (r.ok) {
+      setEstado("ok");
+      setPw("");
+      setTimeout(() => { setEstado(null); setAbierto(false); }, 2500);
+    } else setEstado("error");
+  }
+
+  if (!abierto) {
+    return (
+      <button onClick={() => setAbierto(true)} className="border-2 border-ink px-2 py-1 text-[11px] font-semibold text-ink hover:bg-ink hover:text-paper">
+        Restablecer
+      </button>
+    );
+  }
+  return (
+    <div className="flex items-center gap-2">
+      <input
+        type="text"
+        value={pw}
+        onChange={(e) => setPw(e.target.value)}
+        placeholder="Nueva contraseña"
+        className="w-36 border-2 border-ink bg-paper px-2 py-1 text-xs text-ink outline-none focus:bg-bone"
+      />
+      <button onClick={guardar} disabled={estado === "guardando"} className="border-2 border-ink px-2 py-1 text-[11px] font-semibold text-ink hover:bg-ink hover:text-paper disabled:opacity-50">
+        {estado === "guardando" ? "..." : estado === "ok" ? "✓ Cambiada" : "Guardar"}
+      </button>
+      {estado === "corta" && <span className="text-[11px] text-red-600">Mín. 6</span>}
+      {estado === "error" && <span className="text-[11px] text-red-600">Error</span>}
     </div>
   );
 }
@@ -318,17 +367,17 @@ function ComisionInput({ usuario, onGuardado }) {
         value={valor}
         onChange={(e) => setValor(e.target.value)}
         placeholder="10 (def.)"
-        className="w-20 rounded-none border border-line bg-page px-2 py-1 text-xs text-ink outline-none focus:border-ink"
+        className="w-20 border-2 border-ink bg-paper px-2 py-1 text-xs text-ink outline-none focus:bg-bone"
       />
       <span className="text-xs text-mist">%</span>
       <button
         onClick={guardar}
         disabled={estado === "guardando"}
-        className="rounded-none border border-line px-2 py-1 text-[11px] font-500 text-ink hover:border-ink hover:text-ink disabled:opacity-50"
+        className="border-2 border-ink px-2 py-1 text-[11px] font-semibold text-ink hover:bg-ink hover:text-paper disabled:opacity-50"
       >
         {estado === "guardando" ? "..." : estado === "ok" ? "✓" : "Guardar"}
       </button>
-      {estado === "error" && <span className="text-[11px] text-coral">Error</span>}
+      {estado === "error" && <span className="text-[11px] text-alert">Error</span>}
     </div>
   );
 }

@@ -1,19 +1,19 @@
-import Head from "next/head";
+import Meta from "../../components/Meta";
+import { dominioDelSitio } from "../../lib/sitio";
 import Nav from "../../components/Nav";
 import LegalLayout from "../../components/LegalLayout";
 
 export default function Condiciones() {
   return (
     <>
-      <Head><title>Condiciones de venta — Lamine Resell</title></Head>
+      <Meta title="Condiciones de venta | Lamine Resell" path="/legal/condiciones" />
       <Nav />
       <LegalLayout title="Condiciones de venta">
         
         <h2>1. Objeto</h2>
         <p>
-          Estas condiciones regulan la compra de cuentas con reviews y de
-          paquetes de reviews aplicados a cuentas propias, a través de
-          <strong> laminerresell.com</strong>, operado por{" "}
+          Estas condiciones regulan la compra de cuentas con valoraciones a
+          través de <strong>{dominioDelSitio()}</strong>, operado por{" "}
           <strong>[NOMBRE O RAZÓN SOCIAL DE LAMINE RESELL]</strong>.
         </p>
 
@@ -27,7 +27,6 @@ export default function Condiciones() {
         <h2>3. Plazos de entrega</h2>
         <ul>
           <li>Cuentas ya montadas: se preparan bajo pedido, con un plazo de entrega de hasta 4 semanas</li>
-          <li>Reviews sobre tu propia cuenta: recibirás instrucciones por email, normalmente en menos de 24 horas</li>
           <li>Suscripciones: la primera entrega sigue los plazos anteriores; las renovaciones mensuales se gestionan a lo largo de cada mes</li>
         </ul>
 
@@ -43,20 +42,15 @@ export default function Condiciones() {
           1/2007, el derecho de desistimiento de 14 días no aplica a
           contenido digital cuya ejecución haya comenzado con tu
           consentimiento expreso previo, aceptando que pierdes tu derecho de
-          desistimiento una vez iniciada la entrega.
-        </p>
-        <p className="rounded-none bg-amber-50 px-4 py-3 text-xs text-amber-700">
-          Pendiente técnico: para que esta cláusula sea válida de verdad,
-          el checkout debe pedir que el comprador marque expresamente esta
-          casilla antes de pagar. Ahora mismo el formulario no la tiene —
-          hay que añadirla antes de confiar en esta cláusula.
+          desistimiento una vez iniciada la entrega. Antes de pagar te pedimos
+          que marques expresamente esta aceptación.
         </p>
 
         <h2>6. Suscripciones y cancelación</h2>
         <p>
           Las suscripciones mensuales se renuevan automáticamente hasta que
           el cliente solicite su cancelación, que puede pedir en cualquier
-          momento contactando por Telegram o email. La cancelación surte
+          momento contactando por Telegram. La cancelación surte
           efecto a partir del siguiente ciclo de facturación.
         </p>
 

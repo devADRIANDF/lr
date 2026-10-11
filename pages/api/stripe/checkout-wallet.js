@@ -1,7 +1,8 @@
 import stripe from "../../../lib/stripe";
 import { getUserIdFromReq } from "../../../lib/auth";
+import { seguro } from "../../../lib/seguro";
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
   const uid = getUserIdFromReq(req);
   if (!uid) return res.status(401).json({ error: "No autenticado." });
@@ -39,3 +40,5 @@ export default async function handler(req, res) {
 
   res.status(200).json({ url: session.url });
 }
+
+export default seguro("checkout-wallet", handler, "No se pudo iniciar el pago. Inténtalo de nuevo o escríbenos por Telegram.");

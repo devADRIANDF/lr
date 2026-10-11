@@ -1,11 +1,11 @@
-import Head from "next/head";
+import Meta from "../../components/Meta";
 import Nav from "../../components/Nav";
 import LegalLayout from "../../components/LegalLayout";
 
 export default function Privacidad() {
   return (
     <>
-      <Head><title>Política de privacidad — Lamine Resell</title></Head>
+      <Meta title="Política de privacidad | Lamine Resell" path="/legal/privacidad" />
       <Nav />
       <LegalLayout title="Política de privacidad">
    
@@ -21,7 +21,6 @@ export default function Privacidad() {
         <p>Dependiendo de cómo uses el sitio, podemos tratar:</p>
         <ul>
           <li>Email, para gestionar tu pedido y contactarte</li>
-          <li>ID de tu cuenta en el juego, si compras el producto de reviews a tu propio ID</li>
           <li>Si creas una cuenta: email y contraseña (cifrada)</li>
           <li>Datos de pago: los procesa directamente Stripe, nosotros nunca almacenamos el número de tu tarjeta</li>
         </ul>
@@ -65,9 +64,10 @@ export default function Privacidad() {
 
         <h2>8. Cookies</h2>
         <p>
-          Este sitio usa una cookie técnica para recordar el código de
-          referido de quien te invitó, necesaria para el funcionamiento del
-          programa de afiliados.
+          Este sitio solo usa almacenamiento técnico del navegador, necesario
+          para su funcionamiento: una cookie de sesión si inicias sesión y el
+          código de referido de quien te invitó, para el programa de
+          afiliados. No usamos cookies publicitarias ni de análisis.
         </p>
       </LegalLayout>
     </>
