@@ -1,6 +1,6 @@
 import Head from "next/head";
 
-// Título, descripción y vista previa al compartir el enlace (Telegram, WhatsApp, etc.)
+// Título, descripción y vista previa al compartir el enlace (WhatsApp, redes sociales, etc.)
 export default function Meta({ title, description, path = "" }) {
   const base = process.env.SITE_URL || "";
   const desc = description || "Cuentas con 5, 10, 15 o 20 valoraciones. Sin crear cuenta: eliges, pagas con tarjeta y recibes el acceso por email.";

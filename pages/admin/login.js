@@ -32,7 +32,7 @@ export default function AdminLogin() {
       </Head>
       <main className="flex min-h-screen items-center justify-center bg-ink px-5">
         <form onSubmit={onSubmit} className="w-full max-w-sm bg-paper p-7">
-          <h1 className="cond text-[56px]">Administración</h1>
+          <h1 className="cond text-[40px] min-[360px]:text-[48px] sm:text-[56px]">Administración</h1>
           <label htmlFor="pw" className="field-label mt-7">Contraseña</label>
           <input
             id="pw"

@@ -2,7 +2,7 @@ import Nav from "../components/Nav";
 import Meta from "../components/Meta";
 import Faq from "../components/Faq";
 import { PREGUNTAS } from "../lib/faq";
-import { TELEGRAM_URL } from "../lib/catalogo";
+import { EMPRESA, MAILTO_URL } from "../lib/empresa";
 
 export default function Ayuda() {
   return (
@@ -22,11 +22,12 @@ export default function Ayuda() {
               <div className="bg-ink p-7 text-paper md:sticky md:top-24 md:p-8">
                 <p className="cond text-[44px] md:text-[52px]">¿Tu duda no está aquí?</p>
                 <p className="mt-4 text-[17px] leading-snug text-paper/80">
-                  Escríbenos por Telegram y te ayudamos con tu pedido.
+                  Escríbenos por email y te ayudamos con tu pedido.
                 </p>
-                <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className="btn btn-paper mt-7 w-full">
-                  Abrir Telegram
+                <a href={MAILTO_URL} className="btn btn-paper mt-7 w-full">
+                  Escribir un email
                 </a>
+                <p className="mt-3 break-all text-center text-[15px] text-paper/70">{EMPRESA.email}</p>
               </div>
             </aside>
           </div>

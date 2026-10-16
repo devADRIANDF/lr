@@ -1,6 +1,7 @@
 import stripe from "../../../lib/stripe";
 import { getUserIdFromReq } from "../../../lib/auth";
 import { seguro } from "../../../lib/seguro";
+import { EMPRESA } from "../../../lib/empresa";
 
 async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
@@ -41,4 +42,4 @@ async function handler(req, res) {
   res.status(200).json({ url: session.url });
 }
 
-export default seguro("checkout-wallet", handler, "No se pudo iniciar el pago. Inténtalo de nuevo o escríbenos por Telegram.");
+export default seguro("checkout-wallet", handler, `No se pudo iniciar el pago. Inténtalo de nuevo o escríbenos a ${EMPRESA.email}.`);

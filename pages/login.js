@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import Nav from "../components/Nav";
 import Meta from "../components/Meta";
 import AuthShell from "../components/AuthShell";
-import { TELEGRAM_URL } from "../lib/catalogo";
+import { MAILTO_URL } from "../lib/empresa";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -52,8 +52,11 @@ export default function Login() {
             </p>
             <p className="text-ink/75">
               ¿Has olvidado la contraseña?{" "}
-              <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className="font-semibold text-ink underline underline-offset-4">
-                Escríbenos por Telegram
+              <a
+                href={`${MAILTO_URL}?subject=${encodeURIComponent("Restablecer mi contraseña")}`}
+                className="font-semibold text-ink underline underline-offset-4"
+              >
+                Escríbenos por email
               </a>{" "}
               y te la restablecemos.
             </p>

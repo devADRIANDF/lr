@@ -45,7 +45,7 @@ export default function Saldo() {
 
           <form onSubmit={recargar} className="md:col-span-7">
             <p className="field-label">Cantidad a recargar</p>
-            <div className="grid grid-cols-4 gap-2 md:gap-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {PRESETS.map((p) => (
                 <button
                   type="button"
@@ -73,7 +73,7 @@ export default function Saldo() {
               className="field"
             />
 
-            <button type="submit" disabled={cargando} className="btn btn-ink mt-8 w-full !h-16 !text-[26px]">
+            <button type="submit" disabled={cargando} className="btn btn-ink mt-8 w-full !h-auto min-h-16 !py-3 !text-[26px]">
               {cargando ? "Procesando…" : importeValido ? `Recargar ${eur(amount * 100)}` : "Recargar"}
             </button>
             {status?.error && (

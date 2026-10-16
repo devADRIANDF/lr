@@ -10,10 +10,11 @@ import {
   PRECIO_EXTRA,
   PRECIO_MENSUAL_UNIDAD,
   PLAZO_ENTREGA,
-  TELEGRAM_URL,
   eur,
   eurExacto,
 } from "../lib/catalogo";
+import { refParaEnviar } from "../lib/ref";
+import { MAILTO_URL } from "../lib/empresa";
 
 export default function Producto() {
   const [modo, setModo] = useState("unico"); // 'unico' | 'suscripcion'
@@ -67,7 +68,7 @@ export default function Producto() {
     if (!email.trim()) return setStatus({ error: "Indica tu email para recibir el pedido." });
     if (!acepto) return setStatus({ error: "Marca la casilla para aceptar las condiciones de venta." });
     setStatus("cargando");
-    const ref = router.query.ref || (typeof window !== "undefined" ? localStorage.getItem("rv_ref") : null);
+    const ref = refParaEnviar(Array.isArray(router.query.ref) ? router.query.ref[0] : router.query.ref);
 
     const endpoint = modo === "unico" ? "/api/stripe/checkout-cuenta" : "/api/stripe/checkout-suscripcion";
     const body =
@@ -158,7 +159,7 @@ export default function Producto() {
                     type="button"
                     aria-pressed={modo === k}
                     onClick={() => setModo(k)}
-                    className={`cond-mid px-3 py-4 text-[22px] transition-colors md:text-[26px] ${
+                    className={`cond-mid px-2 py-4 text-[19px] transition-colors min-[360px]:px-3 min-[360px]:text-[22px] md:text-[26px] ${
                       modo === k ? "bg-ink text-paper" : "hover:bg-bone"
                     } ${k === "unico" ? "border-r-[3px] border-ink" : ""}`}
                   >
@@ -218,6 +219,12 @@ export default function Producto() {
                     placeholder="tucorreo@ejemplo.com"
                     className="field"
                   />
+                  <p className="mt-2 text-[13px] leading-snug text-ink/65">
+                    Lo usamos para enviarte el pedido y atenderte.{" "}
+                    <Link href="/legal/privacidad" target="_blank" className="underline underline-offset-2">
+                      Privacidad
+                    </Link>
+                  </p>
                 </div>
               </div>
 
@@ -234,9 +241,9 @@ export default function Producto() {
                         <dd className="font-medium">{eurExacto(extra * PRECIO_EXTRA)}</dd>
                       </div>
                     )}
-                    <div className="flex items-end justify-between gap-4 border-t-[3px] border-ink pt-4">
+                    <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1 border-t-[3px] border-ink pt-4">
                       <dt className="cond-mid text-[28px]">Total hoy</dt>
-                      <dd className="cond text-[56px] leading-[0.8]">{eurExacto(totalUnico)}</dd>
+                      <dd className="cond text-[48px] leading-[0.8] md:text-[56px]">{eurExacto(totalUnico)}</dd>
                     </div>
                   </dl>
                 ) : (
@@ -245,9 +252,9 @@ export default function Producto() {
                       <dt className="text-ink/75">Alta de la cuenta (primer mes)</dt>
                       <dd className="font-medium">{eurExacto(tier.price)}</dd>
                     </div>
-                    <div className="flex items-end justify-between gap-4 border-t-[3px] border-ink pt-4">
+                    <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1 border-t-[3px] border-ink pt-4">
                       <dt className="cond-mid text-[28px]">Después, cada mes</dt>
-                      <dd className="cond text-[56px] leading-[0.8]">{eurExacto(totalMensual)}</dd>
+                      <dd className="cond text-[48px] leading-[0.8] md:text-[56px]">{eurExacto(totalMensual)}</dd>
                     </div>
                   </dl>
                 )}
@@ -271,12 +278,13 @@ export default function Producto() {
                     Acepto las{" "}
                     <Link href="/legal/condiciones" target="_blank" className="font-semibold underline underline-offset-2">
                       condiciones de venta
-                    </Link>{" "}
-                    y que, al ser contenido digital, pierdo el derecho de desistimiento una vez iniciada la entrega.
+                    </Link>
+                    . Consiento que la entrega comience y reconozco que, al ser contenido digital, pierdo el derecho de
+                    desistimiento una vez iniciada.
                   </span>
                 </label>
 
-                <button type="submit" disabled={cargando} className="btn btn-ink mt-6 w-full !h-16 !text-[26px]">
+                <button type="submit" disabled={cargando} className="btn btn-ink mt-6 w-full !h-auto min-h-16 !py-3 !text-[22px] min-[400px]:!text-[26px]">
                   {cargando ? "Procesando…" : etiquetaPago}
                 </button>
                 {status?.error && (
@@ -317,14 +325,14 @@ export default function Producto() {
                 `Una cuenta lista para usar con las valoraciones del tramo que elijas.`,
                 `Los datos de acceso, por email.`,
                 `Se prepara bajo pedido: entrega en un plazo máximo de ${PLAZO_ENTREGA}.`,
-                `Soporte por Telegram si tienes cualquier duda.`,
+                `Soporte por email si tienes cualquier duda.`,
               ].map((t) => (
                 <li key={t} className="border-b-[3px] border-ink py-4 text-[17px] leading-snug">{t}</li>
               ))}
             </ul>
-            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-[17px] font-semibold">
-              <Link href="/ayuda" className="underline underline-offset-4">Preguntas frecuentes</Link>
-              <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">Escribir por Telegram</a>
+            <div className="mt-6 flex flex-wrap gap-x-6 text-[17px] font-semibold">
+              <Link href="/ayuda" className="inline-flex min-h-11 items-center underline underline-offset-4">Preguntas frecuentes</Link>
+              <a href={MAILTO_URL} className="inline-flex min-h-11 items-center underline underline-offset-4">Escribir por email</a>
             </div>
           </aside>
         </div>

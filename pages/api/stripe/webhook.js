@@ -35,6 +35,14 @@ async function marcarProcesado(eventId) {
   } catch {}
 }
 
+// Id de la suscripción a la que pertenece una factura. Las versiones de la API de Stripe anteriores a
+// 2025-03-31 lo traen en invoice.subscription; las nuevas (las de las cuentas recién creadas) en
+// invoice.parent.subscription_details.subscription. Aquí se aceptan las dos y puede venir como texto o como objeto.
+function suscripcionDeFactura(invoice) {
+  const s = invoice?.parent?.subscription_details?.subscription ?? invoice?.subscription ?? null;
+  return s && typeof s === "object" ? s.id || null : s;
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
 
@@ -94,10 +102,11 @@ export default async function handler(req, res) {
   // se registra en checkout.session.completed como cuota de alta)
   if (event.type === "invoice.paid") {
     const invoice = event.data.object;
-    if (invoice.billing_reason === "subscription_cycle" && invoice.subscription) {
+    const subId = suscripcionDeFactura(invoice);
+    if (invoice.billing_reason === "subscription_cycle" && subId) {
       try {
         await registrarRenovacionMensual({
-          stripeSubscriptionId: invoice.subscription,
+          stripeSubscriptionId: subId,
           amountCents: invoice.amount_paid,
         });
       } catch (err) {
@@ -113,9 +122,9 @@ export default async function handler(req, res) {
   }
 
   if (event.type === "invoice.payment_failed") {
-    const invoice = event.data.object;
-    if (invoice.subscription) {
-      await marcarEstadoSuscripcion({ stripeSubscriptionId: invoice.subscription, status: "impago" });
+    const subId = suscripcionDeFactura(event.data.object);
+    if (subId) {
+      await marcarEstadoSuscripcion({ stripeSubscriptionId: subId, status: "impago" });
     }
   }
 

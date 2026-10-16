@@ -43,16 +43,18 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-offs
   /* Tipografía de cartel: grotesca ultracondensada, los trazos verticales de las letras
      hacen eco de los trazos del contador de valoraciones. */
   .cond {
-    font-family: Archivo, "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+    font-family: Archivo, "Arial Narrow", "Roboto Condensed", sans-serif-condensed, "Helvetica Neue", Arial, sans-serif;
     font-stretch: 62%;
+    font-variation-settings: "wdth" 62; /* por si el navegador no traduce font-stretch al eje de ancho */
     font-weight: 800;
     letter-spacing: -0.005em;
     word-spacing: 0.14em;
     line-height: 0.9;
   }
   .cond-mid {
-    font-family: Archivo, "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+    font-family: Archivo, "Arial Narrow", "Roboto Condensed", sans-serif-condensed, "Helvetica Neue", Arial, sans-serif;
     font-stretch: 78%;
+    font-variation-settings: "wdth" 78;
     font-weight: 800;
     letter-spacing: -0.005em;
     word-spacing: 0.12em;
@@ -64,8 +66,9 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-offs
   /* Botones */
   .btn {
     @apply inline-flex h-14 items-center justify-center gap-3 border-[3px] px-7 text-center transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50;
-    font-family: Archivo, "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+    font-family: Archivo, "Arial Narrow", "Roboto Condensed", sans-serif-condensed, "Helvetica Neue", Arial, sans-serif;
     font-stretch: 70%;
+    font-variation-settings: "wdth" 70;
     font-weight: 800;
     font-size: 1.375rem;
     word-spacing: 0.12em;
@@ -87,8 +90,9 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-offs
   /* Texto legal */
   .prose-legal { max-width: 68ch; }
   .prose-legal h2 {
-    font-family: Archivo, "Arial Narrow", sans-serif;
+    font-family: Archivo, "Arial Narrow", "Roboto Condensed", sans-serif-condensed, sans-serif;
     font-stretch: 70%;
+    font-variation-settings: "wdth" 70;
     font-weight: 800;
     font-size: 2rem;
     word-spacing: 0.12em;

@@ -101,19 +101,19 @@ export default function Panel() {
           </div>
 
           {/* Saldo y cifras */}
-          <div className="mt-10 grid border-[3px] border-ink md:grid-cols-12">
-            <div className="bg-ink p-6 text-paper md:col-span-6 md:p-8">
+          <div className="mt-10 grid border-[3px] border-ink lg:grid-cols-12">
+            <div className="bg-ink p-6 text-paper md:p-8 lg:col-span-6">
               <p className="text-[15px] text-paper/70">Saldo del monedero</p>
-              <p className="cond mt-3 text-[88px] leading-[0.8] md:text-[120px]">{eurExacto(walletBalance)}</p>
+              <p className="cond mt-3 text-[length:clamp(56px,20vw,88px)] leading-[0.8] md:text-[120px] lg:text-[88px] xl:text-[120px]">{eurExacto(walletBalance)}</p>
               <Link href="/saldo" className="btn btn-paper mt-8">Recargar saldo</Link>
             </div>
-            <div className="border-t-[3px] border-ink p-6 md:col-span-3 md:border-l-[3px] md:border-t-0 md:p-8">
+            <div className="border-t-[3px] border-ink p-6 md:p-8 lg:col-span-3 lg:border-l-[3px] lg:border-t-0">
               <p className="text-[15px] text-ink/75">Personas invitadas</p>
-              <p className="cond mt-3 text-[88px] leading-[0.8] md:text-[120px]">{totalReferidos}</p>
+              <p className="cond mt-3 text-[length:clamp(56px,20vw,88px)] leading-[0.8] md:text-[120px] lg:text-[88px] xl:text-[120px]">{totalReferidos}</p>
             </div>
-            <div className="border-t-[3px] border-ink p-6 md:col-span-3 md:border-l-[3px] md:border-t-0 md:p-8">
+            <div className="border-t-[3px] border-ink p-6 md:p-8 lg:col-span-3 lg:border-l-[3px] lg:border-t-0">
               <p className="text-[15px] text-ink/75">Ganado en comisiones</p>
-              <p className="cond mt-3 text-[56px] leading-[0.85] md:text-[72px]">{eurExacto(totalGanadoCents)}</p>
+              <p className="cond mt-3 text-[56px] leading-[0.85] md:text-[72px] lg:text-[48px] xl:text-[72px]">{eurExacto(totalGanadoCents)}</p>
             </div>
           </div>
 
@@ -129,7 +129,7 @@ export default function Panel() {
                 value={referralLink || "No disponible"}
                 aria-label="Tu enlace de invitación"
                 onFocus={(e) => e.target.select()}
-                className="field flex-1 text-[15px]"
+                className="field min-w-0 !text-base md:flex-1"
               />
               <button onClick={copiar} className="btn btn-ink md:min-w-[200px]" disabled={!referralLink}>
                 {copiado ? "Copiado" : "Copiar enlace"}

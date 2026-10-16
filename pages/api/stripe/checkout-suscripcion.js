@@ -1,6 +1,7 @@
 import stripe from "../../../lib/stripe";
 import { resolveRefCode } from "../../../lib/referral";
 import { seguro } from "../../../lib/seguro";
+import { EMPRESA } from "../../../lib/empresa";
 
 const PRECIOS_CUENTA = { 5: 5000, 10: 9000, 15: 12500, 20: 16000 };
 const PRECIO_EXTRA_CUENTA = 900; // 9 € por review por encima del tramo (cuota de alta)
@@ -78,4 +79,4 @@ async function handler(req, res) {
   res.status(200).json({ url: session.url });
 }
 
-export default seguro("checkout-suscripcion", handler, "No se pudo iniciar el pago. Inténtalo de nuevo o escríbenos por Telegram.");
+export default seguro("checkout-suscripcion", handler, `No se pudo iniciar el pago. Inténtalo de nuevo o escríbenos a ${EMPRESA.email}.`);

@@ -78,13 +78,9 @@ export default function Tally({ count, capacity, perRow = 4, className = "", gho
   );
 }
 
-// Un solo grupo de cinco, sin animación: para el logotipo y el favicon.
-export function TallyMark({ className = "" }) {
-  return (
-    <svg viewBox={`${-SW / 2} 0 ${GW + SW} ${H}`} className={className} aria-hidden="true" fill="none" stroke="currentColor" strokeWidth={SW} strokeLinecap="butt">
-      {[0, 1, 2, 3, 4].map((i) => (
-        <path key={i} d={trazo(i, 1)} />
-      ))}
-    </svg>
-  );
-}
+// Medidas del grupo de cinco, para dibujar el logotipo (Logo.js) con exactamente los mismos trazos.
+export const MARCA = {
+  alto: H,
+  grosor: SW,
+  trazos: [0, 1, 2, 3, 4].map((i) => trazo(i, 1)),
+};

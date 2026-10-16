@@ -1,12 +1,13 @@
 import { dbGet } from "../../../lib/db";
 import bcrypt from "bcryptjs";
 import { signSession, setSessionCookie, sesionesConfiguradas } from "../../../lib/auth";
+import { EMPRESA } from "../../../lib/empresa";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
   if (!sesionesConfiguradas()) {
     console.error("[login] Falta la variable de entorno JWT_SECRET: no se pueden crear sesiones.");
-    return res.status(500).json({ error: "El acceso no está disponible ahora mismo. Escríbenos por Telegram." });
+    return res.status(500).json({ error: `El acceso no está disponible ahora mismo. Escríbenos a ${EMPRESA.email}.` });
   }
   const { email, password } = req.body || {};
   const user = await dbGet("SELECT * FROM users WHERE email = ?", [(email || "").toLowerCase()]);

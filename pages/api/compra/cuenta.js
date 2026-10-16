@@ -2,6 +2,7 @@ import { dbGet, dbRun } from "../../../lib/db";
 import { getUserIdFromReq } from "../../../lib/auth";
 import { acreditarComision } from "../../../lib/comision";
 import { seguro } from "../../../lib/seguro";
+import { EMPRESA } from "../../../lib/empresa";
 
 const PRECIOS = { 5: 5000, 10: 9000, 15: 12500, 20: 16000 };
 const PRECIO_EXTRA = 900;
@@ -61,4 +62,4 @@ async function handler(req, res) {
   res.status(201).json({ ok: true, orderId: info.lastInsertRowid });
 }
 
-export default seguro("compra-cuenta", handler, "No se pudo completar la compra. Revisa tu saldo e inténtalo de nuevo, o escríbenos por Telegram.");
+export default seguro("compra-cuenta", handler, `No se pudo completar la compra. Revisa tu saldo e inténtalo de nuevo, o escríbenos a ${EMPRESA.email}.`);
