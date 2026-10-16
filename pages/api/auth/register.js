@@ -1,10 +1,7 @@
-import { dbGet, dbRun } from "../../../lib/db";
-import bcrypt from "bcryptjs";
-import { customAlphabet } from "nanoid";
+import { dbGet } from "../../../lib/db";
+import { crearUsuario } from "../../../lib/usuarios";
 import { signSession, setSessionCookie, sesionesConfiguradas } from "../../../lib/auth";
 import { EMPRESA } from "../../../lib/empresa";
-
-const genCode = customAlphabet("ABCDEFGHJKLMNPQRSTUVWXYZ23456789", 7);
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
@@ -27,16 +24,15 @@ export default async function handler(req, res) {
     if (refUser) referredBy = refUser.id;
   }
 
-  const hash = bcrypt.hashSync(password, 10);
-  let code = genCode();
-  while (await dbGet("SELECT id FROM users WHERE referral_code = ?", [code])) code = genCode();
+  let nuevo;
+  try {
+    nuevo = await crearUsuario({ email: email.toLowerCase(), password, referidoPor: referredBy });
+  } catch (error) {
+    if (error?.code === "EMAIL_EXISTE") return res.status(409).json({ error: "Ese email ya está registrado." });
+    throw error;
+  }
 
-  const info = await dbRun(
-    "INSERT INTO users (email, password_hash, wallet_balance, referral_code, referred_by) VALUES (?, ?, 0, ?, ?)",
-    [email.toLowerCase(), hash, code, referredBy]
-  );
-
-  const token = signSession(info.lastInsertRowid);
+  const token = signSession(nuevo.id);
   setSessionCookie(res, token);
   res.status(201).json({ ok: true });
 }

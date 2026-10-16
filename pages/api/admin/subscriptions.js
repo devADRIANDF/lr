@@ -1,13 +1,18 @@
-import { dbAll } from "../../../lib/db";
+import { dbAll, responderErrorBD } from "../../../lib/db";
 import stripe from "../../../lib/stripe";
-import { isAdminReq } from "../../../lib/adminAuth";
+import { getAdmin } from "../../../lib/adminAuth";
 
 export default async function handler(req, res) {
-  if (!isAdminReq(req)) return res.status(401).json({ error: "No autorizado." });
+  res.setHeader("Cache-Control", "no-store, max-age=0");
+  if (!(await getAdmin(req))) return res.status(401).json({ error: "No autorizado." });
 
   if (req.method === "GET") {
-    const rows = await dbAll("SELECT * FROM subscriptions ORDER BY created_at DESC");
-    return res.status(200).json({ subscriptions: rows });
+    try {
+      const rows = await dbAll("SELECT * FROM subscriptions ORDER BY created_at DESC");
+      return res.status(200).json({ subscriptions: rows });
+    } catch (error) {
+      return responderErrorBD(res, error, "admin/subscriptions");
+    }
   }
 
   if (req.method === "POST") {

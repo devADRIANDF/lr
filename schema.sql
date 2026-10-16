@@ -11,11 +11,13 @@ CREATE TABLE IF NOT EXISTS users (
   referral_code TEXT UNIQUE NOT NULL,
   referred_by INTEGER,
   commission_rate NUMERIC,            -- % de comisión de referido propio; vacío = 10% por defecto
+  is_admin BOOLEAN NOT NULL DEFAULT FALSE,  -- TRUE = puede entrar al panel /admin con su email y contraseña
   created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- Si la tabla users ya existía sin esta columna, la añade (no hace nada si ya está)
+-- Si la tabla users ya existía sin estas columnas, las añade (no hace nada si ya están)
 ALTER TABLE users ADD COLUMN IF NOT EXISTS commission_rate NUMERIC;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT FALSE;
 
 CREATE TABLE IF NOT EXISTS subscriptions (
   id SERIAL PRIMARY KEY,
@@ -68,3 +70,13 @@ CREATE TABLE IF NOT EXISTS stripe_events (
   id TEXT PRIMARY KEY,
   created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+-- Seguridad: la web se conecta directo a Postgres con el usuario dueño de las tablas, que ignora RLS.
+-- Activar RLS sin crear políticas bloquea cualquier acceso desde la API pública de Supabase (Data API),
+-- por si algún día se activa: usuarios, pedidos y contraseñas no quedan expuestos.
+ALTER TABLE users             ENABLE ROW LEVEL SECURITY;
+ALTER TABLE subscriptions     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE orders            ENABLE ROW LEVEL SECURITY;
+ALTER TABLE wallet_topups     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE referral_earnings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE stripe_events     ENABLE ROW LEVEL SECURITY;
